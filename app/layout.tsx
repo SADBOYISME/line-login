@@ -23,6 +23,7 @@ export default function RootLayout({
         <AntdRegistry>
           <ConfigProvider locale={en_US}>
             {children}
+            <Analytics />
           </ConfigProvider>
         </AntdRegistry>
 
