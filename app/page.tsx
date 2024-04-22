@@ -23,26 +23,30 @@ export default function Home() {
 
   const [init, setInit] = useState<any>(null)
 
-  useEffect(() => {
-    console.log('useEffect')
-    initLiff()
-      .then((res: any) => {
-        setInit(res)
-      })
-  }, [])
+  // useEffect(() => {
+  //   console.log('useEffect')
+  //   initLiff()
+  //     .then((res: any) => {
+  //       setInit(res)
+  //     })
+  // }, [])
 
-  if (!init) {
-    return <h1> Loading... </h1>
-  }
+  // if (!init) {
+  //   return <h1> Loading... </h1>
+  // }
 
   return (
     <>
-      <h2>  liffId: {liffId}</h2>
+      {/* <h2>  liffId: {liffId}</h2>
       {JSON.stringify(init)}
       <h2>USER ID LINE : {init?.userId}</h2>
       <h2>DisplayName : {init?.displayName}</h2>
       <h2>StatusMessage : {init?.statusMessage}</h2>
-      <img src={init?.pictureUrl} width={200} height={200} alt="profile" />
+      <img src={init?.pictureUrl} width={200} height={200} alt="profile" /> */}
+
+
+
+
     </>
   );
 }

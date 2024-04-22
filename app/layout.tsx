@@ -1,8 +1,10 @@
 import { Analytics } from "@vercel/analytics/react"
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { ConfigProvider } from "antd";
+import en_US from 'antd/locale/en_US';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,7 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+      <body className={inter.className}>
+        <AntdRegistry>
+          <ConfigProvider locale={en_US}>
+            {children}
+          </ConfigProvider>
+        </AntdRegistry>
+
+      </body>
+    </html >
   );
 }
