@@ -294,7 +294,7 @@ function Page() {
                                 {/* <Title level={3}>Acceptable Use Policy</Title> */}
                                 <Title level={3}>Introduction</Title>
                                 <Paragraph>
-                                    This Acceptable Use Policy (the "Policy") outlines the acceptable use of data collected from customers by [Your Company Name] ("Company") in compliance with applicable laws and regulations. By accessing or using our services, you agree to comply with this Policy. Failure to comply may result in the termination of services.
+                                    This Acceptable Use Policy (the Policy) outlines the acceptable use of data collected from customers by [Your Company Name] (Company) in compliance with applicable laws and regulations. By accessing or using our services, you agree to comply with this Policy. Failure to comply may result in the termination of services.
                                 </Paragraph>
 
                                 <Title level={3}>Data Collection</Title>
