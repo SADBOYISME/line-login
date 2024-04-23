@@ -10,11 +10,14 @@ import {
     ProFormRadio,
     PageContainer
 } from '@ant-design/pro-components';
-import { Watermark, message, Avatar, Space, Result, Button } from 'antd';
+import { Watermark, message, Avatar, Space, Result, Button, Typography, List } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import liff from '@line/liff';
 import { LoadingOutlined } from '@ant-design/icons';
+import ListCountry from '@/utils/list-country';
+import IndustyOptions from '@/utils/list-industy';
 
+const { Paragraph, Text, Title } = Typography;
 const waitTime = (time: number = 100) => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -38,30 +41,30 @@ const initLiff = async (liffId: string) => {
 
 
 function Page() {
-    const [init, setInit] = useState<any>(null)
-    const [signOut, setSignOut] = useState<any>(false)
+    // const [init, setInit] = useState<any>(null)
+    // const [signOut, setSignOut] = useState<any>(false)
 
-    const signOutApp = async () => {
-        liff.logout()
-        setSignOut(!signOut)
-    }
+    // const signOutApp = async () => {
+    //     liff.logout()
+    //     setSignOut(!signOut)
+    // }
 
-    useEffect(() => {
-        console.log('useEffect')
-        initLiff(liffId)
-            .then((res: any) => {
-                setInit(res)
-            })
-    }, [signOut])
+    // useEffect(() => {
+    //     console.log('useEffect')
+    //     initLiff(liffId)
+    //         .then((res: any) => {
+    //             setInit(res)
+    //         })
+    // }, [signOut])
     const formRef = useRef<ProFormInstance>();
-    if (!init) {
-        return (
-            <Result
-                icon={<LoadingOutlined />}
-                title="Loading... Please wait a moment."
-            />
-        )
-    }
+    // if (!init) {
+    //     return (
+    //         <Result
+    //             icon={<LoadingOutlined />}
+    //             title="Loading... Please wait a moment."
+    //         />
+    //     )
+    // }
     return (
 
         <Watermark
@@ -71,8 +74,11 @@ function Page() {
         >
             <PageContainer
                 title="TCI Campaign"
-                extra={<Space><Avatar shape="square" size={50} src={init?.pictureUrl} />
-                    <Button onClick={signOutApp} type='primary' danger>Sign Out</Button></Space>
+                extra={
+                    <Space>
+                        {/* <Avatar shape="square" size={50} src={init?.pictureUrl} /> */}
+                        {/* <Button onClick={signOutApp} type='primary' danger>Sign Out</Button> */}
+                    </Space>
                 }
             >
                 <ProCard>
@@ -151,7 +157,7 @@ function Page() {
                                 width="md"
                                 tooltip="your first name"
                                 placeholder="Please enter your first name"
-                                rules={[{ required: true }]}
+                                rules={[{ required: true, type: 'string' }]}
                             />
 
                             <ProFormText
@@ -160,7 +166,7 @@ function Page() {
                                 width="md"
                                 tooltip="your last name"
                                 placeholder="Please enter your last name"
-                                rules={[{ required: true }]}
+                                rules={[{ required: true, type: 'string' }]}
                             />
 
                             <ProFormText
@@ -169,7 +175,17 @@ function Page() {
                                 width="md"
                                 tooltip="your email"
                                 placeholder="Please enter your email"
-                                rules={[{ required: true }]}
+                                rules={[{ required: true, type: 'email' }]}
+                            />
+
+                            {/* phone number */}
+                            <ProFormText
+                                name="phone"
+                                label="Phone"
+                                width="md"
+                                tooltip="your phone number"
+                                placeholder="Please enter your phone number"
+                                rules={[{ required: true, type: 'string', pattern: /^[0-9]+$/ }]}
                             />
 
                             <ProFormSelect
@@ -179,16 +195,7 @@ function Page() {
                                 tooltip="your industry"
                                 placeholder="Please enter your industry"
                                 rules={[{ required: true }]}
-                                options={[
-                                    {
-                                        value: 'china',
-                                        label: 'China',
-                                    },
-                                    {
-                                        value: 'usa',
-                                        label: 'USA',
-                                    },
-                                ]}
+                                options={IndustyOptions}
                             />
 
 
@@ -199,16 +206,9 @@ function Page() {
                                 tooltip="your industry"
                                 placeholder="Please enter your country"
                                 rules={[{ required: true }]}
-                                options={[
-                                    {
-                                        value: 'china',
-                                        label: 'China',
-                                    },
-                                    {
-                                        value: 'usa',
-                                        label: 'USA',
-                                    },
-                                ]}
+                                options={
+                                    ListCountry()
+                                }
                             />
 
 
@@ -264,7 +264,8 @@ function Page() {
                             {/* Materials Science */}
                             <ProFormCheckbox.Group
                                 name="materialsScience"
-                                label="Materials Science Type"
+                                label={<h1>Materials Science Type</h1>}
+                                style={{ color: 'red' }}
                                 width="md"
                                 options={['Materials Science- Battery Materials',
                                     'Materials Science- Biomaterials', 'Materials Science- NanocarbonMaterials', 'Materials Science- Electronics Materials',
@@ -281,50 +282,145 @@ function Page() {
                                 description: 'Please read the agreement before submitting the form',
                             }}
                         >
+
+
+                            <ProCard title="Privacy and policy"
+                                extra={"1/01/2022"}
+                                split={'horizontal'}
+                                spellCheck={true}
+                                style={{ overflowY: 'auto', height: '500px' }}
+                            >
+                                <br />
+                                {/* <Title level={3}>Acceptable Use Policy</Title> */}
+                                <Title level={3}>Introduction</Title>
+                                <Paragraph>
+                                    This Acceptable Use Policy (the "Policy") outlines the acceptable use of data collected from customers by [Your Company Name] ("Company") in compliance with applicable laws and regulations. By accessing or using our services, you agree to comply with this Policy. Failure to comply may result in the termination of services.
+                                </Paragraph>
+
+                                <Title level={3}>Data Collection</Title>
+                                <List
+                                    split={false}
+
+                                    dataSource={[
+                                        'Company collects data from customers for the purpose of providing services, improving user experience, and complying with legal obligations.',
+                                        'Data collected may include personal information such as name, email address, and contact information.',
+                                        'Company may also collect usage data, cookies, and other tracking technologies to enhance services and tailor content.',
+                                    ]}
+                                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                                />
+
+                                <Title level={3}>Acceptable Use</Title>
+                                <Paragraph>
+                                    Customers agree to:
+                                </Paragraph>
+                                <List
+
+                                    dataSource={[
+                                        'Provide accurate and up-to-date information.',
+                                        'Use services in compliance with applicable laws and regulations.',
+                                        'Respect the privacy and rights of other users.',
+                                        'Not engage in any activity that may compromise the security or integrity of Company\'s systems or data.',
+                                    ]}
+                                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                                />
+
+                                <Title level={3}>Prohibited Activities</Title>
+                                <Paragraph>
+                                    Customers shall not:
+                                </Paragraph>
+                                <List
+
+                                    dataSource={[
+                                        'Share login credentials or access to their accounts.',
+                                        'Attempt to gain unauthorized access to Company\'s systems or data.',
+                                        'Transmit any malicious software, viruses, or harmful code.',
+                                        'Use services for any unlawful, fraudulent, or abusive purpose.',
+                                        'Engage in any activity that violates the rights of others.',
+                                    ]}
+                                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                                />
+
+                                <Title level={2}>Privacy Policy</Title>
+
+                                <Title level={3}>Introduction</Title>
+                                <Paragraph>
+                                    This Privacy Policy outlines how Company collects, uses, and protects data obtained from customers. By using our services, you consent to the collection and use of your data as described in this Policy.
+                                </Paragraph>
+
+                                <Title level={3}>Information Collection</Title>
+                                <List
+
+                                    dataSource={[
+                                        'Company collects personal information provided by customers, including but not limited to name, email address, and contact information.',
+                                        'Company may also collect usage data, cookies, and other tracking technologies to analyze trends, administer services, and personalize content.',
+                                    ]}
+                                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                                />
+
+                                <Title level={3}>Use of Information</Title>
+                                <Paragraph>
+                                    Company may use collected data for the following purposes:
+                                </Paragraph>
+                                <List
+
+                                    dataSource={[
+                                        'Providing and improving services.',
+                                        'Communicating with customers about products, services, and updates.',
+                                        'Analyzing usage trends and preferences.',
+                                        'Complying with legal obligations and protecting Company\'s rights.',
+                                    ]}
+                                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                                />
+
+                                <Title level={3}>Data Sharing</Title>
+                                <Paragraph>
+                                    Company may share collected data with third-party service providers for the purpose of providing and improving services. Company will not sell, rent, or lease your personal information to third parties unless otherwise specified or required by law.
+                                </Paragraph>
+
+                                <Title level={3}>Data Security</Title>
+                                <Paragraph>
+                                    Company implements appropriate technical and organizational measures to protect data from unauthorized access, disclosure, alteration, or destruction.
+                                </Paragraph>
+
+                                <Title level={3}>Your Rights</Title>
+                                <Paragraph>
+                                    Customers have the right to:
+                                </Paragraph>
+                                <List
+
+                                    dataSource={[
+                                        'Access and update their personal information.',
+                                        'Request the deletion of their personal information.',
+                                        'Opt-out of receiving promotional communications.',
+                                    ]}
+                                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                                />
+
+                                <Title level={3}>Contact Us</Title>
+                                <Paragraph>
+                                    If you have any questions or concerns about this Policy, please contact us at [Contact Information].
+                                </Paragraph>
+
+
+
+
+                            </ProCard>
                             <ProFormCheckbox.Group
                                 name="checkbox"
-                                label="部署单元"
+                                label="Agreement"
                                 rules={[
                                     {
                                         required: true,
                                     },
                                 ]}
-                                options={['部署单元1', '部署单元2', '部署单元3']}
+                                options={['I have read and agree to the agreement']}
                             />
-                            <ProFormSelect
-                                label="部署分组策略"
-                                name="remark"
-                                rules={[
-                                    {
-                                        required: true,
-                                    },
-                                ]}
-                                initialValue="1"
-                                options={[
-                                    {
-                                        value: '1',
-                                        label: '策略一',
-                                    },
-                                    { value: '2', label: '策略二' },
-                                ]}
-                            />
-                            <ProFormSelect
-                                label="Pod 调度策略"
-                                name="remark2"
-                                initialValue="2"
-                                options={[
-                                    {
-                                        value: '1',
-                                        label: '策略一',
-                                    },
-                                    { value: '2', label: '策略二' },
-                                ]}
-                            />
+
                         </StepsForm.StepForm>
                     </StepsForm>
                 </ProCard>
             </PageContainer>
-        </Watermark>
+        </Watermark >
 
     );
 }
