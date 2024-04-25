@@ -10,14 +10,16 @@ import {
     ProFormRadio,
     PageContainer
 } from '@ant-design/pro-components';
-import { Watermark, message, Avatar, Space, Result, Button, Typography, List, Col, Row } from 'antd';
+import { Watermark, message, Avatar, Space, Result, Button, Typography, List, notification } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import liff from '@line/liff';
 import { LoadingOutlined } from '@ant-design/icons';
 import ListCountry from '@/utils/list-country';
 import IndustyOptions from '@/utils/list-industy';
 import CheckUser from '@/components/server/8n8-web-hook/check-user';
-
+import { CreateUser } from '@/components/server/8n8-web-hook/create-user';
+import { NotificationPlacement } from 'antd/es/notification/interface';
+import { useRouter } from 'next/navigation'
 
 
 const { Paragraph, Text, Title } = Typography;
@@ -44,16 +46,25 @@ const initLiff = async () => {
 
 
 function Page() {
+    const [api, contextHolder] = notification.useNotification();
     const [init, setInit] = useState<any>(null)
     const [checkUser, setCheckUser] = useState<any>(null)
     const [signOut, setSignOut] = useState<any>(false)
-
+    const [loading, setLoading] = useState<boolean>(false)
+    const router = useRouter()
     const signOutApp = async () => {
         liff.logout()
         setSignOut(!signOut)
     }
 
-
+    const openNotification = (placement: NotificationPlacement) => {
+        api.info({
+            message: `Please wait a moment. We are processing your request.`,
+            description: 'Thank you for your registration.',
+            placement,
+            duration: 0,
+        });
+    };
 
     useEffect(() => {
 
@@ -68,6 +79,12 @@ function Page() {
         }
         init()
 
+        // cleanup
+        return () => {
+            console.log('cleanup')
+        }
+
+
     }, [signOut])
     const formRef = useRef<ProFormInstance>();
     if (!init) {
@@ -76,9 +93,9 @@ function Page() {
                 icon={<LoadingOutlined />}
                 title="Loading... Please wait a moment."
                 extra={[
-                    <Button type="primary" key="console" onClick={() => setInit(true)}>
-                        Bypass
-                    </Button>,
+                    // <Button type="primary" key="console" onClick={() => setInit(true)}>
+                    //     Bypass
+                    // </Button>,
                 ]}
             />
 
@@ -107,7 +124,7 @@ function Page() {
                 extra={[
                     <Button type="primary" key="console" onClick={
                         () => {
-                            signOutApp()
+                            router.refresh()
                         }
                     }>
                         Try Again
@@ -125,11 +142,12 @@ function Page() {
             zIndex={1}
 
         >
+            {contextHolder}
             <PageContainer
                 title="TCI Campaign"
                 extra={
                     <Space>
-                        {/* <Avatar shape="square" size={50} src={init?.pictureUrl} /> */}
+                        <Avatar shape="square" size={50} src={init?.pictureUrl} />
                         {/* <Button onClick={signOutApp} type='primary' danger>Sign Out</Button> */}
                     </Space>
                 }
@@ -139,17 +157,33 @@ function Page() {
                         name: string;
                     }>
                         formRef={formRef}
-                        onFinish={async (values: any) => {
-                            await waitTime(1000);
-                            message.success('Submit finished!');
 
-                            console.log('values', values)
+                        onFinish={async (values: any) => {
+
+                            setLoading(true)
+                            openNotification('top')
+
+
+                            const req = await CreateUser(values)
+                            console.log('req', req)
+                            if (req.status === true) {
+                                message.success('Registration is successful.')
+                                await waitTime(2000);
+                                router.refresh()
+                                return true
+
+                            } else {
+                                message.error('Registration is failed.')
+                                return false
+                            }
+
 
                         }}
                         formProps={{
                             validateMessages: {
                                 required: 'Field is required!',
                             },
+                            loading: !loading
                         }}
                     >
                         <StepsForm.StepForm<{
@@ -162,17 +196,17 @@ function Page() {
                             }}
                             onFinish={async () => {
                                 console.log(formRef.current?.getFieldsValue());
-                                await waitTime(2000);
+                                await waitTime(1000);
                                 return true;
                             }}
                         >
                             {/* hiden form store line profile */}
-                            {/* <ProFormText
+                            <ProFormText
                                 name="lineUserId"
                                 label="Line User ID"
                                 width="md"
                                 disabled={true}
-                                // hidden
+                                hidden
                                 initialValue={init?.userId}
                             />
 
@@ -181,7 +215,7 @@ function Page() {
                                 label="Line Name"
                                 width="md"
                                 disabled={true}
-                                // hidden
+                                hidden
                                 initialValue={init?.displayName}
                             />
 
@@ -190,9 +224,9 @@ function Page() {
                                 label="Line Picture URL"
                                 width="md"
                                 disabled={true}
-                                // hidden
+                                hidden
                                 initialValue={init?.pictureUrl}
-                            /> */}
+                            />
 
 
                             {/* add Existing Customer? use  */}
@@ -235,6 +269,14 @@ function Page() {
 
                             />
 
+                            <ProFormText
+                                name="jobTitle"
+                                label="Job Title"
+                                width="md"
+                                tooltip="your job title"
+                                placeholder="Optional"
+
+                            />
 
                             <ProFormText
                                 name="firstName"
@@ -291,6 +333,7 @@ function Page() {
                                 tooltip="your industry"
                                 placeholder="Please enter your country"
                                 rules={[{ required: true }]}
+                                initialValue={'Thailand'}
                                 options={
                                     ListCountry()
                                 }
