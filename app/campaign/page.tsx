@@ -16,6 +16,9 @@ import liff from '@line/liff';
 import { LoadingOutlined } from '@ant-design/icons';
 import ListCountry from '@/utils/list-country';
 import IndustyOptions from '@/utils/list-industy';
+import CheckUser from '@/components/server/8n8-web-hook/check-user';
+
+
 
 const { Paragraph, Text, Title } = Typography;
 const waitTime = (time: number = 100) => {
@@ -27,7 +30,7 @@ const waitTime = (time: number = 100) => {
 };
 
 const liffId: string = '2004715229-2vR586jr';
-const initLiff = async (liffId: string) => {
+const initLiff = async () => {
     await liff.init({ liffId: liffId })
     if (!liff.isLoggedIn()) {
         liff.login()
@@ -42,6 +45,7 @@ const initLiff = async (liffId: string) => {
 
 function Page() {
     const [init, setInit] = useState<any>(null)
+    const [checkUser, setCheckUser] = useState<any>(null)
     const [signOut, setSignOut] = useState<any>(false)
 
     const signOutApp = async () => {
@@ -49,12 +53,21 @@ function Page() {
         setSignOut(!signOut)
     }
 
+
+
     useEffect(() => {
+
         console.log('useEffect')
-        initLiff(liffId)
-            .then((res: any) => {
-                setInit(res)
-            })
+        const init = async () => {
+            const profile = await initLiff()
+            setInit(profile)
+            if (profile) {
+                const check = await CheckUser(profile.userId)
+                setCheckUser(check)
+            }
+        }
+        init()
+
     }, [signOut])
     const formRef = useRef<ProFormInstance>();
     if (!init) {
@@ -62,9 +75,49 @@ function Page() {
             <Result
                 icon={<LoadingOutlined />}
                 title="Loading... Please wait a moment."
+                extra={[
+                    <Button type="primary" key="console" onClick={() => setInit(true)}>
+                        Bypass
+                    </Button>,
+                ]}
+            />
+
+            // add button to set init 
+
+        )
+    }
+
+    if (checkUser?.status === true) {
+        return (
+            <Result
+                status="success"
+                title="You have already registered for the event."
+                subTitle="You can close this window."
             />
         )
     }
+
+
+    if (checkUser?.status === false && checkUser?.code === 1) {
+        return (
+            <Result
+                status="error"
+                title="We have encountered an server error. Please try again later."
+                subTitle="You can only register once."
+                extra={[
+                    <Button type="primary" key="console" onClick={
+                        () => {
+                            signOutApp()
+                        }
+                    }>
+                        Try Again
+                    </Button>,
+                ]
+                }
+            />
+        )
+    }
+
     return (
 
         <Watermark
@@ -76,7 +129,7 @@ function Page() {
                 title="TCI Campaign"
                 extra={
                     <Space>
-                        <Avatar shape="square" size={50} src={init?.pictureUrl} />
+                        {/* <Avatar shape="square" size={50} src={init?.pictureUrl} /> */}
                         {/* <Button onClick={signOutApp} type='primary' danger>Sign Out</Button> */}
                     </Space>
                 }
@@ -86,11 +139,12 @@ function Page() {
                         name: string;
                     }>
                         formRef={formRef}
-                        onFinish={async (values) => {
+                        onFinish={async (values: any) => {
                             await waitTime(1000);
                             message.success('Submit finished!');
 
-                            console.log(values);
+                            console.log('values', values)
+
                         }}
                         formProps={{
                             validateMessages: {
@@ -113,7 +167,7 @@ function Page() {
                             }}
                         >
                             {/* hiden form store line profile */}
-                            <ProFormText
+                            {/* <ProFormText
                                 name="lineUserId"
                                 label="Line User ID"
                                 width="md"
@@ -138,7 +192,7 @@ function Page() {
                                 disabled={true}
                                 // hidden
                                 initialValue={init?.pictureUrl}
-                            />
+                            /> */}
 
 
                             {/* add Existing Customer? use  */}
@@ -149,11 +203,11 @@ function Page() {
                                 width="md"
                                 options={[
                                     {
-                                        value: 'y',
+                                        value: true,
                                         label: 'Yes',
                                     },
                                     {
-                                        value: 'n',
+                                        value: false,
                                         label: 'No',
                                     },
 
@@ -259,15 +313,20 @@ function Page() {
                                 return true;
                             }}
                         >
+
+
                             <ProFormCheckbox.Group
                                 name="productInterestAnalytical"
                                 label="Analytical Chemistry Type"
                                 width="md"
-                                options={['Analytical Chemistry- Analytical Chemistry- Electrophoresis',
-                                    'Analytical Chemistry- HPLC', 'Analytical Chemistry- Resins and Media',
-                                    'Analytical Chemistry- Standards', 'Analytical Chemistry- NMR', 'Analytical Chemistry- GC',
-                                    'Life Science- Biochemicals', 'Life Science- Glycoscience', 'Life Science- Molecular Biology',
-
+                                options={[
+                                    'Analytical Chemistry- Reagents',
+                                    'Analytical Chemistry- Electrophoresis',
+                                    'Analytical Chemistry- HPLC',
+                                    'Analytical Chemistry- Resins and Media',
+                                    'Analytical Chemistry- Standards',
+                                    'Analytical Chemistry- NMR',
+                                    'Analytical Chemistry- GC',
                                 ]}
 
                             />
@@ -276,32 +335,43 @@ function Page() {
                                 name="productInterestChemistry"
                                 label="Chemistry Type"
                                 width="md"
-                                options={['Chemistry- Asymmetric Synthesis', 'Chemistry- Chemical Biology', 'Chemistry- Drug Discovery Research Reagents',
-                                    'Chemistry- Solvents', 'Chemistry- Synthetic Reagents', 'Chemistry- Organometallic Reagents', 'Chemistry- Building Blocks',
+                                options={[
+                                    'Chemistry- Asymmetric Synthesis',
+                                    'Chemistry- Chemical Biology',
+                                    'Chemistry- Drug Discovery Research Reagents',
+                                    'Chemistry- Solvents',
+                                    'Chemistry- Synthetic Reagents',
+                                    'Chemistry- Organometallic Reagents',
+                                    'Chemistry- Building Blocks',
                                     'Chemistry- Catalysis and Inorganic Chemistry',
                                 ]}
 
                             />
 
                             {/* Life Science */}
-                            <ProFormCheckbox.Group
+                            < ProFormCheckbox.Group
                                 name="productInterestLifeScience"
                                 label="Life Science Type"
                                 width="md"
-                                options={['Life Science- Biochemicals', 'Life Science- Glycoscience', 'Life Science- Molecular Biology'
-
+                                options={[
+                                    'Life Science- Biochemicals',
+                                    'Life Science- Glycoscience',
+                                    'Life Science- Molecular Biology'
                                 ]}
 
                             />
 
                             {/* Materials Science */}
-                            <ProFormCheckbox.Group
+                            < ProFormCheckbox.Group
                                 name="productInterestMaterialsScience"
                                 label="Materials Science Type"
                                 style={{ color: 'red' }}
                                 width="md"
-                                options={['Materials Science- Battery Materials',
-                                    'Materials Science- Biomaterials', 'Materials Science- NanocarbonMaterials', 'Materials Science- Electronics Materials',
+                                options={[
+                                    'Materials Science- Battery Materials',
+                                    'Materials Science- Biomaterials',
+                                    'Materials Science- NanocarbonMaterials',
+                                    'Materials Science- Electronics Materials',
                                     'Materials Science- Polymer/Macromolecule Reagents'
                                 ]}
 
