@@ -31,7 +31,7 @@ const waitTime = (time: number = 100) => {
     });
 };
 
-const liffId: string = '2004715229-2vR586jr';
+const liffId: string = '';
 const initLiff = async () => {
     await liff.init({ liffId: liffId })
     if (!liff.isLoggedIn()) {
